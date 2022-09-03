@@ -19,7 +19,7 @@ const rowsDivs = () => {
   })
 }
 
-// rowsDivs()
+rowsDivs()
 
 const container = document.createElement('div')
 container.className = 'container'
@@ -38,7 +38,7 @@ const colsDivs = () => {
   })
 }
 
-// colsDivs()
+colsDivs()
 
 const boardDiv = document.createElement('div')
 boardDiv.className = 'board'
@@ -62,19 +62,19 @@ integer.forEach((integer, i) => {
   const number = {}
   number.button = document.createElement('button')
 
-  // if (i <= 3) {
-  //   number.row = 1
-  //   number.col = i + 1
-  // } else if (i <= 7) {
-  //   number.row = 2
-  //   number.col = i - 3
-  // } else if (i <= 11) {
-  //   number.row = 3
-  //   number.col = i - 7
-  // } else if (i <= 15) {
-  //   number.row = 4
-  //   number.col = i - 11
-  // }
+  if (i <= 3) {
+    number.row = 1
+    number.col = i + 1
+  } else if (i <= 7) {
+    number.row = 2
+    number.col = i - 3
+  } else if (i <= 11) {
+    number.row = 3
+    number.col = i - 7
+  } else if (i <= 15) {
+    number.row = 4
+    number.col = i - 11
+  }
 
   if (integer == ' ') {
 
