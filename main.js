@@ -2,10 +2,6 @@ import './style.css'
 
 const app = document.querySelector('#app')
 
-// const titleH1 = document.createElement('h1')
-// titleH1.innerText = 'Fifteen Puzzle'
-// app.appendChild(titleH1)
-
 const rowsDivs = () => {
   const rowsNumbers = Array.from({ length: 4 }, (_, i) => i + 1)
   const rowsNumbersContainer = document.createElement('div')
@@ -17,9 +13,7 @@ const rowsDivs = () => {
     rownumberDiv.className = 'rowNumber'
     rowsNumbersContainer.appendChild(rownumberDiv)
   })
-}
-
-rowsDivs()
+} // rowsDivs()
 
 const container = document.createElement('div')
 container.className = 'container'
@@ -36,9 +30,11 @@ const colsDivs = () => {
     colnumberDiv.className = 'colNumber'
     colsNumbersContainer.appendChild(colnumberDiv)
   })
-}
+} // colsDivs()
 
-colsDivs()
+const titleH1 = document.createElement('h1')
+titleH1.innerText = 'Fifteen Puzzle'
+container.appendChild(titleH1)
 
 const boardDiv = document.createElement('div')
 boardDiv.className = 'board'
@@ -48,15 +44,13 @@ container.appendChild(boardDiv)
 const integer = Array.from({ length: 15 }, (_, i) => i + 1)
 integer.push(' ') // add the empty 
 
-// SHUFFLE
+// SHUFFLE THE ARRAY 
 integer.sort(() => {
   return Math.random() - 0.5;
 })
 
 // INIT numbers array of number object
 const numbers = []
-
-// DOM POPULATION
 integer.forEach((integer, i) => {
 
   const number = {}
@@ -94,55 +88,162 @@ integer.forEach((integer, i) => {
 
 })
 
-
+// GAME LOGIC
 numbers.forEach(number => {
+
   number.button.addEventListener('mousedown', () => {
 
     const clickedNumber = number
+    const emptyNumber = numbers.find(({ value }) => value === ' ')
 
     const indexEmpty = numbers.findIndex(number => number.value === ' ')
-    const indexClicked = numbers.findIndex(number => number.value === clickedNumber.value )
-    
-    // const empty = numbers.find(({ value }) => value === ' ')
+    const indexClicked = numbers.findIndex(number => number.value === clickedNumber.value)
 
-    let indexDiff = indexEmpty - indexClicked
+    const indexDiff = indexEmpty - indexClicked
+    const indexAbs = Math.abs(indexDiff)
 
-    if (Math.abs(indexDiff) == 1 || Math.abs(indexDiff) == 4) {
+    const indexesToSwap = []
 
-      console.log(`move right ${indexDiff}`)
+    indexesToSwap.push(indexEmpty)
+    indexesToSwap.push(indexClicked)
 
-      // LOGIC
-      numbers[indexEmpty].value = numbers[indexEmpty - indexDiff].value
-      numbers[indexEmpty - indexDiff].value = ' '
-
-      // DOM
-      numbers[indexEmpty].button.innerText = numbers[indexEmpty - indexDiff].button.innerText
-      numbers[indexEmpty].button.className = 'number' 
-      numbers[indexEmpty - indexDiff].button.innerText = ' '
-      numbers[indexEmpty - indexDiff].button.className = 'empty'
-
-      numbers[indexEmpty].button.classList.add('canmove')        
-      setTimeout(() => {
-        numbers[indexEmpty].button.classList.remove('canmove')        
-      }, 250);
-
-      console.table(numbers)
-
-    } else {
+    // CLICKED EMPTY
+    if (indexClicked == indexEmpty) {
 
       clickedNumber.button.classList.add('cannotmove')
       setTimeout(() => {
         clickedNumber.button.classList.remove('cannotmove')
       }, 500);
 
+    }
+
+    // MOVE NEAREST
+    else if (indexAbs == 1 && clickedNumber.row == emptyNumber.row ||
+      indexAbs == 4 && clickedNumber.col == emptyNumber.col) {
+
+      swapNumberValue(numbers, clickedNumber, emptyNumber)
+    }
+
+    // MOVE ON ROWS
+    else if (indexDiff > 1 && clickedNumber.row == emptyNumber.row) {
+
+      for (let i = 1; i < indexAbs; i++) {
+        indexesToSwap.push(indexClicked + i)
+      }
+
+      indexesToSwap.sort((a, b) => b - a)
+      indexesToSwap.pop()
+
+      indexesToSwap.forEach(index => {
+        swapNumberValue(numbers, numbers[index - 1], numbers[index])
+      })
+
+    } else if (indexDiff < 1 && clickedNumber.row == emptyNumber.row) {
+
+      for (let i = 1; i < indexAbs; i++) {
+        indexesToSwap.push(indexEmpty + i)
+      }
+
+      indexesToSwap.sort((a, b) => a - b)
+      indexesToSwap.pop()
+
+      indexesToSwap.forEach(index => {
+        swapNumberValue(numbers, numbers[index], numbers[index + 1])
+      })
+
+    }
+
+    // MOVE ON COLUMNS
+    else if (indexDiff > 1 && clickedNumber.col == emptyNumber.col) {
+
+      for (let i = 0; i < indexAbs; i = i + 4) {
+        indexesToSwap.push(indexClicked + i)
+      }
+
+      indexesToSwap.sort((a, b) => b - a)
+      indexesToSwap.pop()
+      indexesToSwap.pop()
+
+      indexesToSwap.forEach(index => {
+        swapNumberValue(numbers, numbers[index - 4], numbers[index])
+      })
+
+    } else if (indexDiff < 1 && clickedNumber.col == emptyNumber.col) {
+
+      for (let i = 0; i < indexAbs; i = i + 4) {
+        indexesToSwap.push(indexEmpty + i)
+      }
+
+      indexesToSwap.sort((a, b) => a - b)
+      indexesToSwap.pop()
+      indexesToSwap.shift()
+
+      indexesToSwap.forEach(index => {
+        swapNumberValue(numbers, numbers[index], numbers[index + 4])
+      })
+
+    }
+    
+    // CANNOT MOVE
+    else {
+
+      clickedNumber.button.classList.add('cannotmove')
+      setTimeout(() => {
+        clickedNumber.button.classList.remove('cannotmove')
+      }, 500);
 
     }
 
 
 
+
+    console.table(numbers)
+
   })
+
+  
+
 })
 
-console.table(numbers);
+
+function swapNumberValue(numbers, number1, number2) {
+
+  // Find the index of item that contains value1
+  const indexOfValue1 = numbers.findIndex(number => number.value === number1.value)
+  // and 2
+  const indexOfValue2 = numbers.findIndex(number => number.value === number2.value)
+
+  // Swap the values
+  // console.table(numbers);
+  const tempValue = numbers[indexOfValue1].value
+
+  number1.value = number2.value
+  number2.value = tempValue
+
+  const tempClass = numbers[indexOfValue1].button.className
+
+  number1.button.className = number2.button.className
+  number2.button.className = tempClass
+
+  const tempInnerText = numbers[indexOfValue1].button.innerText
+
+  number1.button.innerText = number2.button.innerText
+  number2.button.innerText = tempInnerText
+
+  // if (number1.value < number2.value) {
+  //   numbers[indexOfValue2].button.classList.add('canmove')
+  //   setTimeout(() => {
+  //     numbers[indexOfValue2].button.classList.remove('canmove')
+  //   }, 250);
+  // } else {
+  //   numbers[indexOfValue1].button.classList.add('canmove')
+  //   setTimeout(() => {
+  //     numbers[indexOfValue1].button.classList.remove('canmove')
+  //   }, 250);
+  // }
+
+  return numbers
+
+}
 
 
