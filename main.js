@@ -2,7 +2,7 @@ import './style.css'
 import { uniqueNamesGenerator, names } from 'unique-names-generator';
 
 const app = document.querySelector('#app')
-const DEBUG_LEADERBOARD = true
+const DEBUG_LEADERBOARD = false
 
 function newGame() {
 
