@@ -211,6 +211,7 @@ function newGame() {
 
       movesNum.innerText = `${moves} moves`
 
+      // WINNER?
       if (checkWin(numbers)) {
 
         const leaderBoardObj = {}
@@ -284,17 +285,14 @@ function swapNumberValue(numbers, number1, number2) {
 
   // Swap the values
   const tempValue = numbers[indexOfValue1].value
-
   number1.value = number2.value
   number2.value = tempValue
 
   const tempClass = numbers[indexOfValue1].button.className
-
   number1.button.className = number2.button.className
   number2.button.className = tempClass
 
   const tempInnerText = numbers[indexOfValue1].button.innerText
-
   number1.button.innerText = number2.button.innerText
   number2.button.innerText = tempInnerText
 
